@@ -1,20 +1,20 @@
 import asyncio
 import json
-import os
 import aiofiles
-from importlib.resources import files
+from pathlib import Path
 from random import random
+from typing import Any
 from fastapi import Request
 
-_DATA_PATH = files("app.resources").joinpath("instruments.json")
+_DATA_PATH = Path(__file__).resolve().parent.parent / "resources" / "instruments.json"
 
 async def get_instruments(
     skip: int = 0,
     limit: int = 10,
     symbol: str | None = None,
     sort_by_pnl: bool = False,
-) -> list[dict]:
-    async with aiofiles.open(os.fspath(_DATA_PATH), 'r') as f:
+) -> list[dict[str, Any]]:
+    async with aiofiles.open(_DATA_PATH, 'r') as f:
         content = await f.read()
         mock_db = json.loads(content)
 
@@ -27,7 +27,7 @@ async def get_instruments(
     
     return filtered_instruments[skip: skip + limit]
 
-async def get_instrument_by_symbol(symbol: str) -> dict | None:
+async def get_instrument_by_symbol(symbol: str) -> dict[str, Any] | None:
     instruments = await get_instruments()
     for instrument in instruments:
         if instrument['symbol'] == symbol:

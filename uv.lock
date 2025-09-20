@@ -42,9 +42,7 @@ dependencies = [
     { name = "aiofiles" },
     { name = "fastapi" },
     { name = "pydantic" },
-    { name = "pyrefly" },
     { name = "python-dotenv" },
-    { name = "ruff" },
     { name = "uvicorn" },
 ]
 
@@ -62,12 +60,10 @@ requires-dist = [
     { name = "fastapi" },
     { name = "httpx", marker = "extra == 'test'" },
     { name = "pydantic" },
-    { name = "pyrefly", specifier = ">=0.33.1" },
-    { name = "pyrefly", marker = "extra == 'test'" },
+    { name = "pyrefly", marker = "extra == 'test'", specifier = ">=0.33.1" },
     { name = "pytest", marker = "extra == 'test'" },
     { name = "python-dotenv" },
-    { name = "ruff", specifier = ">=0.13.1" },
-    { name = "ruff", marker = "extra == 'test'" },
+    { name = "ruff", marker = "extra == 'test'", specifier = ">=0.13.1" },
     { name = "uvicorn" },
 ]
 provides-extras = ["test"]
