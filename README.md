@@ -35,11 +35,12 @@ fastapi-rest-api
 3. **Set up environment variables:**
    Create a `.env` file in the root directory and add your environment variables.
 
-4. **Test**
+4. **Test & coverage**
    ```
    uv sync --extra test
    uv run pytest
    ```
+   Running the suite prints a coverage summary and writes `coverage.xml` (for tooling) while skipping files listed in `.gitignore`.
 4. **Run the application:**
    ```
    uvicorn app.main:app --reload
@@ -55,3 +56,4 @@ Swagger: http://localhost:8000/docs (http://localhost:8001/docs on Docker)
 
 ## TODO
 * Migrate to uv, incl. Dockerfile
+* GitHub Action? 
