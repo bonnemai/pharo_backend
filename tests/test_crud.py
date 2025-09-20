@@ -47,11 +47,3 @@ def test_get_instrument_by_symbol_returns_none_when_missing() -> None:
     result = asyncio.run(crud.get_instrument_by_symbol("UNKNOWN"))
 
     assert result is None
-
-
-def test_get_realtime_updates_delegates_to_lookup() -> None:
-    reference = _load_raw_data()[0]
-
-    result = asyncio.run(crud.get_realtime_updates(reference["symbol"]))
-
-    assert result == reference

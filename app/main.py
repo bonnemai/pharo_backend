@@ -1,17 +1,17 @@
+import os
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-
 from .api.routes import router as api_router
 
 app = FastAPI()
 
 FAVICON_PATH = Path(__file__).resolve().parent / "resources" / "favicon.svg"
-
+allow_origin=os.environ.get('ALLOW_ORIGIN', '*')
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[allow_origin],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
