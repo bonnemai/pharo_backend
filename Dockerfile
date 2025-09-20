@@ -8,7 +8,7 @@ RUN uv sync --extra test
 COPY app ./app
 COPY tests ./tests
 RUN uv run ruff check
-
+RUN uv run pyrefly check
 RUN uv run pytest
 
 FROM astral/uv:python3.12-bookworm-slim
