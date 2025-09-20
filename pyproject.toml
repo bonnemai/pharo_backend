@@ -20,6 +20,8 @@ dependencies = [
 test = [
     "pytest",
     "httpx",
+    "ruff>=0.13.1",
+    "pyrefly>=0.33.1",
 ]
 
 [tool.setuptools]

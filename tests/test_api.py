@@ -30,7 +30,7 @@ def test_read_instruments_uses_service_layer(monkeypatch: pytest.MonkeyPatch, cl
     mock_get_instruments = AsyncMock(return_value=expected_payload)
     monkeypatch.setattr("app.api.routes.get_instruments", mock_get_instruments)
 
-    response = client.get("/api/api/instruments", params={"symbol": "AAPL"})
+    response = client.get("/api/instruments", params={"symbol": "AAPL"})
 
     assert response.status_code == 200
     assert response.json() == expected_payload
@@ -41,7 +41,7 @@ def test_read_instruments_returns_404_when_missing(monkeypatch: pytest.MonkeyPat
     mock_get_instruments = AsyncMock(return_value=None)
     monkeypatch.setattr("app.api.routes.get_instruments", mock_get_instruments)
 
-    response = client.get("/api/api/instruments")
+    response = client.get("/api/instruments")
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Instruments not found"
@@ -53,7 +53,7 @@ def test_stream_realtime_updates_returns_payload(monkeypatch: pytest.MonkeyPatch
     mock_get_updates = AsyncMock(return_value=expected_payload)
     monkeypatch.setattr("app.api.routes.get_instruments", mock_get_updates)
 
-    response = client.get("/api/api/instruments/realtime")
+    response = client.get("/api/instruments/realtime")
 
     assert response.status_code == 200
     assert response.json() != expected_payload

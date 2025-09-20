@@ -6,11 +6,14 @@ from importlib.resources import files
 from random import random
 from fastapi import Request
 
-from app.models.schemas import Instrument
-
 _DATA_PATH = files("app.resources").joinpath("instruments.json")
 
-async def get_instruments(skip: int = 0, limit: int = 10, symbol: str | None = None, sort_by_pnl: bool = False) -> list[Instrument]:
+async def get_instruments(
+    skip: int = 0,
+    limit: int = 10,
+    symbol: str | None = None,
+    sort_by_pnl: bool = False,
+) -> list[dict]:
     async with aiofiles.open(os.fspath(_DATA_PATH), 'r') as f:
         content = await f.read()
         mock_db = json.loads(content)
@@ -24,7 +27,7 @@ async def get_instruments(skip: int = 0, limit: int = 10, symbol: str | None = N
     
     return filtered_instruments[skip: skip + limit]
 
-async def get_instrument_by_symbol(symbol: str) -> Instrument | None:
+async def get_instrument_by_symbol(symbol: str) -> dict | None:
     instruments = await get_instruments()
     for instrument in instruments:
         if instrument['symbol'] == symbol:
