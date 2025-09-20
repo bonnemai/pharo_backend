@@ -24,7 +24,7 @@ def test_get_instruments_filters_by_symbol() -> None:
 
     result = asyncio.run(crud.get_instruments(symbol=symbol))
 
-    assert len(result) == 10
+    assert len(result) == 61
     assert result[0]["symbol"] == symbol
 
 

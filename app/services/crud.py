@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 async def get_instruments(
     skip: int = 0,
-    limit: int = 10,
+    limit: int = 100,
     symbol: str | None = None,
     sort_by_pnl: bool = False,
 ) -> list[dict[str, Any]]:
@@ -70,8 +70,8 @@ async def sse_stream(request: Request):
             instruments = await get_instruments()
 
             for instrument in instruments: 
-                instrument['price']*=2*dice-1
-                instrument['pnl']*=2*dice-1
+                instrument['price']*=1+.2*(dice-1)
+                instrument['pnl']*=1+.2*(dice-1)
             
             yield sse_pack("upsert", {"rows": instruments})
             logger.debug("Pushed SSE update with dice=%.3f", dice)

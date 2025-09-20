@@ -1,11 +1,26 @@
+import json
 import os
+from logging.config import dictConfig
 from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from starlette.middleware import Middleware
 
 from .api.routes import router as api_router
+
+
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
+LOGGING_CONFIG_PATH = Path(__file__).resolve().parent / "config" / "logging.json"
+
+with LOGGING_CONFIG_PATH.open("r", encoding="utf-8") as config_file:
+    logging_config = json.load(config_file)
+
+logging_config["handlers"]["default"]["level"] = LOG_LEVEL
+logging_config["root"]["level"] = LOG_LEVEL
+
+dictConfig(logging_config)
 
 allow_origin = os.environ.get("ALLOW_ORIGIN", "*")
 
