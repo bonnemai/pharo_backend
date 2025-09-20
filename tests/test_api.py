@@ -16,6 +16,14 @@ def test_read_root_returns_welcome_message(client: TestClient) -> None:
     assert response.json() == {"message": "Welcome to the FastAPI REST API!"}
 
 
+def test_favicon_returns_svg_document(client: TestClient) -> None:
+    response = client.get("/favicon.ico")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("image/svg+xml")
+    assert response.text.startswith("<svg")
+
+
 @pytest.mark.skip('In progress')
 def test_read_instruments_uses_service_layer(monkeypatch: pytest.MonkeyPatch, client: TestClient) -> None:
     expected_payload = [{"symbol": "AAPL", "pnl": 10.0}]

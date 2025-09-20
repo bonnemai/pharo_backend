@@ -1,7 +1,19 @@
+FROM astral/uv:python3.12-bookworm-slim AS builder
+WORKDIR /app
+
+COPY pyproject.toml uv.lock README.md ./
+RUN uv pip install --no-cache-dir --system '.[test]'
+RUN uv sync --extra test
+   
+COPY app ./app
+COPY tests ./tests
+
+RUN uv run pytest
+
 FROM astral/uv:python3.12-bookworm-slim
 WORKDIR /app
 
-COPY pyproject.toml README.md ./
+COPY pyproject.toml uv.lock README.md ./
 COPY app ./app
 
 RUN uv pip install --no-cache-dir --system .

@@ -38,7 +38,7 @@ fastapi-rest-api
 4. **Test**
    ```
    uv sync --extra test
-   uv run python -m pytest
+   uv run pytest
    ```
 4. **Run the application:**
    ```
@@ -46,7 +46,7 @@ fastapi-rest-api
    ```
 
 ## Usage
-Swagger: http://localhost:8000/docs
+Swagger: http://localhost:8000/docs (http://localhost:8001/docs on Docker)
 - **Fetch instruments:**
   - `GET /api/instruments` - Retrieve a list of instruments, with optional filtering by symbol and sorting by P&L.
   

@@ -19,7 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest",
-    "httpx"
+    "httpx",
 ]
 
 [tool.setuptools]
@@ -30,7 +30,10 @@ where = ["."]
 include = ["app*"]
 
 [tool.setuptools.package-data]
-"app" = ["resources/*.json"]
+"app" = [
+    "resources/*.json",
+    "resources/*.svg",
+]
 
 [tool.pytest.ini_options]
 addopts = "-q"
