@@ -24,17 +24,22 @@ fastapi-rest-api
 1. **Create a virtual environment:**
    ```
    uv venv .venv
-   source .venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   source .venv/bin/activate
    ```
 
 2. **Install dependencies:**
    ```
-   uv pip install -r requirements.txt
+   uv sync
    ```
 
 3. **Set up environment variables:**
    Create a `.env` file in the root directory and add your environment variables.
 
+4. **Test**
+   ```
+   uv sync --extra test
+   uv run python -m pytest
+   ```
 4. **Run the application:**
    ```
    uvicorn app.main:app --reload
