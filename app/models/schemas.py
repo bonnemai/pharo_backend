@@ -9,10 +9,3 @@ class Instrument(BaseModel):
     price: float
     pnl: float
     sparkline: list[Sparkline]
-
-class InstrumentResponse(BaseModel):
-    instrument: Instrument
-
-class InstrumentListResponse(BaseModel):
-    instruments: list[Instrument]
-

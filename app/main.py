@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware import Middleware
 
 from .api.routes import router as api_router
@@ -35,6 +36,9 @@ middleware = [
 ]
 
 app = FastAPI(middleware=middleware)
+
+instrumentator = Instrumentator()
+instrumentator.instrument(app).expose(app)
 
 FAVICON_PATH = Path(__file__).resolve().parent / "resources" / "favicon.svg"
 
