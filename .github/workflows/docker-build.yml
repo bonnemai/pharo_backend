@@ -64,6 +64,8 @@ jobs:
           file: Dockerfile
           platforms: linux/arm64
           push: true
+          provenance: false
+          sbom: false
           outputs: type=registry,oci-mediatypes=false
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
