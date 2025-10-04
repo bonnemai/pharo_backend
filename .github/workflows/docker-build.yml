@@ -64,6 +64,7 @@ jobs:
           file: Dockerfile
           platforms: linux/arm64
           push: true
+          outputs: type=registry,oci-mediatypes=false
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
             ghcr.io/${{ github.repository }}:latest
@@ -78,7 +79,7 @@ jobs:
           echo "uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
 
       - name: Update Lambda function
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.AWS_LAMBDA_FUNCTION_NAME != ''
         run: |
           aws lambda update-function-code \
             --function-name "${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}" \
