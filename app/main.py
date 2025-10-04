@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from mangum import Mangum
 from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware import Middleware
@@ -41,6 +41,8 @@ instrumentator = Instrumentator()
 instrumentator.instrument(app).expose(app)
 
 FAVICON_PATH = Path(__file__).resolve().parent / "resources" / "favicon.svg"
+HOME_PAGE_PATH = Path(__file__).resolve().parent / "resources" / "home.html"
+HOME_PAGE_HTML = HOME_PAGE_PATH.read_text(encoding="utf-8")
 
 app.include_router(api_router, prefix="/api")
 
@@ -50,9 +52,9 @@ async def favicon() -> FileResponse:
     return FileResponse(FAVICON_PATH, media_type="image/svg+xml")
 
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the FastAPI REST API!"}
+@app.get("/", response_class=HTMLResponse)
+async def read_root() -> str:
+    return HOME_PAGE_HTML
 
 
 handler = Mangum(app)
