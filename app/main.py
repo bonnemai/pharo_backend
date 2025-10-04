@@ -24,13 +24,12 @@ logging_config["root"]["level"] = LOG_LEVEL
 
 dictConfig(logging_config)
 
-allow_origin = os.environ.get("ALLOW_ORIGIN", "*")
-
+allow_origins = [o.strip() for o in os.getenv("CORS_ALLOW_ORIGINS", "*").split(",") if o.strip()]
 middleware = [
     Middleware(
         CORSMiddleware,  # type: ignore[arg-type]
-        allow_origins=[allow_origin],
-        allow_credentials=True,
+        allow_origins=allow_origins,
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
