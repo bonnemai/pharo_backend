@@ -18,10 +18,9 @@ async def get_instruments(
 ) -> list[dict[str, Any]]:
     async with aiofiles.open(_DATA_PATH, 'r') as f:
         content = await f.read()
-        mock_db = json.loads(content)
-        logger.debug("Loaded %s instruments from %s", len(mock_db), _DATA_PATH)
+        filtered_instruments = json.loads(content)
+        logger.debug("Loaded %s instruments from %s", len(filtered_instruments), _DATA_PATH)
 
-    filtered_instruments = mock_db
     if symbol:
         filtered_instruments = [instrument for instrument in filtered_instruments if instrument["symbol"] == symbol]
         logger.debug("Filtered instruments by symbol '%s': %s matched", symbol, len(filtered_instruments))
@@ -40,9 +39,6 @@ async def get_instrument_by_symbol(symbol: str) -> dict[str, Any] | None:
             return instrument
     logger.debug("No instrument found for symbol '%s'", symbol)
     return None
-
-# async def get_realtime_updates(symbol: str) -> Instrument | None:
-#     return await get_instrument_by_symbol(symbol)
 
 def sse_pack(event: str | None, data: dict) -> str:
     """Format one SSE message with optional event name."""
@@ -70,8 +66,8 @@ async def sse_stream(request: Request):
             instruments = await get_instruments()
 
             for instrument in instruments: 
-                instrument['price']*=1+.2*(dice-1)
-                instrument['pnl']*=1+.2*(dice-1)
+                instrument['price']*=1+.2*(dice-.5)
+                instrument['pnl']*=1+.2*(dice-.5)
             
             yield sse_pack("upsert", {"rows": instruments})
             logger.debug("Pushed SSE update with dice=%.3f", dice)

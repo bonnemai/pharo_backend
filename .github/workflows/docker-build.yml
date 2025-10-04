@@ -12,6 +12,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+    environment: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'prd' || 'ci' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -27,12 +29,52 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure AWS credentials
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Build Docker image
+        if: github.event_name != 'push' || github.ref != 'refs/heads/main'
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: false
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
             ghcr.io/${{ github.repository }}:latest
+
+      - name: Build and push Docker image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+
+      - name: Prepare image URI
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: image
+        run: |
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}"
+          echo "uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+
+      - name: Update Lambda function
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          aws lambda update-function-code \
+            --function-name "${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}" \
+            --image-uri "${{ steps.image.outputs.uri }}"

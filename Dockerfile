@@ -1,25 +1,23 @@
-FROM astral/uv:python3.12-bookworm-slim AS builder
+FROM public.ecr.aws/lambda/python:3.12 AS builder
 WORKDIR /app
 
-COPY pyproject.toml uv.lock README.md ./
-RUN uv pip install --no-cache-dir --system '.[test]'
-RUN uv sync --extra test
-   
+COPY pyproject.toml README.md ./
+RUN python -m pip install --upgrade pip
+RUN pip install --no-cache-dir '.[test]'
+
 COPY app ./app
 COPY tests ./tests
-RUN uv run ruff check
-RUN uv run pyrefly check
-RUN uv run pytest
+RUN ruff check
+RUN pyrefly check
+RUN pytest
 
-FROM astral/uv:python3.12-bookworm-slim
-WORKDIR /app
+FROM public.ecr.aws/lambda/python:3.12
+WORKDIR ${LAMBDA_TASK_ROOT}
 
-COPY pyproject.toml uv.lock README.md ./
+COPY pyproject.toml README.md ./
+RUN python -m pip install --upgrade pip
+RUN pip install --no-cache-dir .
+
 COPY app ./app
 
-RUN uv pip install --no-cache-dir --system .
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-  CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=5)"]
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["app.main.handler"]

@@ -15,6 +15,7 @@ dependencies = [
     "python-dotenv",
     "aiofiles",
     "prometheus-fastapi-instrumentator",
+    "mangum",
 ]
 
 [project.optional-dependencies]

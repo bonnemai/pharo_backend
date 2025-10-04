@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from mangum import Mangum
 from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware import Middleware
 
@@ -53,3 +54,6 @@ async def favicon() -> FileResponse:
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the FastAPI REST API!"}
+
+
+handler = Mangum(app)
