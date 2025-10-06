@@ -80,9 +80,15 @@ jobs:
           IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}"
           echo "uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
 
-      # - name: Update Lambda function
-      #   if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.AWS_LAMBDA_FUNCTION_NAME != ''
-      #   run: |
-      #     aws lambda update-function-code \
-      #       --function-name "${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}" \
-      #       --image-uri "${{ steps.image.outputs.uri }}"
+      - name: Update Lambda function
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          aws lambda update-function-code \
+            --function-name "${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}" \
+            --image-uri "${{ steps.image.outputs.uri }}"
+
+          # Wait for update to complete
+          aws lambda wait function-updated-v2 \
+            --function-name "${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}"
+
+          echo "Lambda function updated successfully with image: ${{ steps.image.outputs.uri }}"
