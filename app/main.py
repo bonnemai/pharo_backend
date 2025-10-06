@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime, timezone
 from logging.config import dictConfig
 from pathlib import Path
 
@@ -32,6 +33,7 @@ middleware = [
         allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["*"],
     )
 ]
 
@@ -42,7 +44,8 @@ instrumentator.instrument(app).expose(app)
 
 FAVICON_PATH = Path(__file__).resolve().parent / "resources" / "favicon.svg"
 HOME_PAGE_PATH = Path(__file__).resolve().parent / "resources" / "home.html"
-HOME_PAGE_HTML = HOME_PAGE_PATH.read_text(encoding="utf-8")
+BUILD_DATE = os.environ.get("BUILD_DATE", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"))
+HOME_PAGE_HTML = HOME_PAGE_PATH.read_text(encoding="utf-8").replace("{{BUILD_DATE}}", BUILD_DATE)
 
 app.include_router(api_router, prefix="/api")
 
