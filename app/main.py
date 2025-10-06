@@ -60,4 +60,4 @@ async def read_root() -> str:
     return HOME_PAGE_HTML
 
 
-handler = Mangum(app)
+handler = Mangum(app, api_gateway_base_path="/", lifespan="auto")

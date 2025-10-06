@@ -21,14 +21,20 @@ async def get_instruments(
         filtered_instruments = json.loads(content)
         logger.debug("Loaded %s instruments from %s", len(filtered_instruments), _DATA_PATH)
 
+    # Add random variations to price and pnl for demo purposes
+    dice = random()
+    for instrument in filtered_instruments:
+        instrument['price'] *= 1 + 0.2 * (dice - 0.5)
+        instrument['pnl'] *= 1 + 0.2 * (dice - 0.5)
+
     if symbol:
         filtered_instruments = [instrument for instrument in filtered_instruments if instrument["symbol"] == symbol]
         logger.debug("Filtered instruments by symbol '%s': %s matched", symbol, len(filtered_instruments))
-    
+
     if sort_by_pnl:
         filtered_instruments.sort(key=lambda x: x["pnl"], reverse=True)
         logger.debug("Sorted instruments by pnl descending")
-    
+
     return filtered_instruments[skip: skip + limit]
 
 async def get_instrument_by_symbol(symbol: str) -> dict[str, Any] | None:
@@ -40,45 +46,3 @@ async def get_instrument_by_symbol(symbol: str) -> dict[str, Any] | None:
     logger.debug("No instrument found for symbol '%s'", symbol)
     return None
 
-def sse_pack(event: str | None, data: dict) -> str:
-    """Format one SSE message with optional event name."""
-    payload = f"data: {json.dumps(data)}\n"
-    if event:
-        payload = f"event: {event}\n" + payload
-    return payload + "\n"
-
-async def sse_stream(request: Request):
-    """Continuously push random upserts/deletes and heartbeats."""
-    import time
-    start_time = time.time()
-    max_duration = 29  # seconds
-
-    try:
-        while True:
-            # Check if we've exceeded the maximum duration
-            if time.time() - start_time >= max_duration:
-                logger.info("SSE stream reached maximum duration of %d seconds", max_duration)
-                break
-
-            if await request.is_disconnected():
-                logger.info("SSE client disconnected")
-                break
-
-            # heartbeat every 10s (helps load balancers / keep-alive)
-            yield "event: ping\ndata: {}\n\n"
-
-            dice = random()
-
-            # random demo mutation
-            await asyncio.sleep(dice)
-
-            instruments = await get_instruments()
-
-            for instrument in instruments:
-                instrument['price']*=1+.2*(dice-.5)
-                instrument['pnl']*=1+.2*(dice-.5)
-
-            yield sse_pack("upsert", {"rows": instruments})
-            logger.debug("Pushed SSE update with dice=%.3f", dice)
-    except asyncio.CancelledError:
-        logger.info("SSE stream cancelled by server")

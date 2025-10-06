@@ -1,8 +1,7 @@
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Query, Request
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, HTTPException, Query
 from app.models.schemas import Instrument
-from app.services.crud import get_instruments, sse_stream
+from app.services.crud import get_instruments
 
 router = APIRouter()
 
@@ -15,15 +14,3 @@ async def read_instruments(
     if instruments is None:
         raise HTTPException(status_code=404, detail="Instruments not found")
     return instruments
-
-@router.get("/instruments/realtime")
-async def stream_realtime_updates(request: Request):
-    headers = {
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-        "Retry-After": "1000",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-        "Access-Control-Allow-Headers": "*",
-    }
-    return StreamingResponse(sse_stream(request), media_type="text/event-stream", headers=headers)
