@@ -49,8 +49,17 @@ def sse_pack(event: str | None, data: dict) -> str:
 
 async def sse_stream(request: Request):
     """Continuously push random upserts/deletes and heartbeats."""
+    import time
+    start_time = time.time()
+    max_duration = 29  # seconds
+
     try:
         while True:
+            # Check if we've exceeded the maximum duration
+            if time.time() - start_time >= max_duration:
+                logger.info("SSE stream reached maximum duration of %d seconds", max_duration)
+                break
+
             if await request.is_disconnected():
                 logger.info("SSE client disconnected")
                 break
@@ -65,10 +74,10 @@ async def sse_stream(request: Request):
 
             instruments = await get_instruments()
 
-            for instrument in instruments: 
+            for instrument in instruments:
                 instrument['price']*=1+.2*(dice-.5)
                 instrument['pnl']*=1+.2*(dice-.5)
-            
+
             yield sse_pack("upsert", {"rows": instruments})
             logger.debug("Pushed SSE update with dice=%.3f", dice)
     except asyncio.CancelledError:
