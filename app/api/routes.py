@@ -22,5 +22,8 @@ async def stream_realtime_updates(request: Request):
         "Cache-Control": "no-cache",
         "Connection": "keep-alive",
         "Retry-After": "1000",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "*",
     }
     return StreamingResponse(sse_stream(request), media_type="text/event-stream", headers=headers)
